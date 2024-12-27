@@ -88,7 +88,7 @@ export interface NavigationBar {
 
 // Data structure for Navigation Bar
 export const navigationBar: NavigationBar = {
-  logo: '/images/IMG_5550.jpeg',
+  logo: '/images/purple_pen_svg_dark.svg',
   items: [
     {
       label: 'Services',

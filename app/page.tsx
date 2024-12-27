@@ -1,8 +1,13 @@
 import Footer from 'components/layout/footer';
 import { Navbar } from 'components/site_sections/SiteNavbar';
 import { navigationBar } from '@/prisma/sectionContent';
-import PriceCards from 'components/site_sections/PriceCards';
-import { storePriceCards } from '@/prisma/priceCards';
+import PriceCards from 'components/site_sections/CompletePriceCards';
+import {
+  storePriceCards,
+  digitalMarketingPriceCards,
+  aiAgentPriceCards,
+  combinationPriceCards
+} from '@/prisma/priceCards';
 
 import HeroSection from 'components/site_sections/Hero';
 
@@ -18,7 +23,12 @@ export default function HomePage() {
     <>
       <Navbar navigationBar={navigationBar} />
       <HeroSection />
-      <PriceCards cards={storePriceCards} />
+      <PriceCards
+        combinationCards={combinationPriceCards}
+        storeCards={storePriceCards}
+        digitalMarketingCards={digitalMarketingPriceCards}
+        aiAgentCards={aiAgentPriceCards}
+      />
     </>
   );
 }

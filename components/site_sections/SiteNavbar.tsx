@@ -30,13 +30,25 @@ export function Navbar({ navigationBar }: { navigationBar: NavigationBar }) {
   const pathname = usePathname();
 
   return (
-    <nav className="bg-background text-foreground shadow-sm">
+    <nav className="bg-background/80 text-foreground shadow-sm backdrop-blur-sm">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="flex h-16 items-center justify-between">
-          <div className="flex-shrink-0">
-            <Link href="/" className="flex items-center">
-              <Image src={navigationBar.logo} alt="Logo" width={32} height={32} />
-            </Link>
+        <div className="flex h-24 items-center justify-between">
+          <div className="relative h-24 w-24 flex-shrink-0">
+            {/* <Link href="/" className="flex items-center">
+              <Image
+                src={navigationBar.logo}
+                alt="Purple Pen Logo"
+                width={120}
+                height={120}
+                className="absolute left-0 top-0 h-24 w-24 object-contain transition-opacity hover:opacity-90"
+                priority
+                quality={100}
+                style={{
+                  filter: 'brightness(1.1) contrast(1.1)',
+                  backgroundColor: 'transparent'
+                }}
+              />
+            </Link> */}
           </div>
           <div className="hidden flex-grow justify-center sm:flex">
             <DesktopNav items={navigationBar.items} />
@@ -44,7 +56,10 @@ export function Navbar({ navigationBar }: { navigationBar: NavigationBar }) {
           <div className="hidden items-center space-x-4 sm:flex">
             <ThemeToggle />
             {navigationBar.ctaButton && (
-              <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90">
+              <Button
+                asChild
+                className="bg-primary px-6 py-2.5 text-base text-primary-foreground hover:bg-primary/90"
+              >
                 <Link href={navigationBar.ctaButton.link}>{navigationBar.ctaButton.text}</Link>
               </Button>
             )}
@@ -91,7 +106,7 @@ function DesktopNav({ items }: { items: NavigationBar['items'] }) {
             {item.submenu ? (
               <NavigationMenuTrigger
                 className={cn(
-                  'rounded-md px-3 py-2 text-sm font-medium text-foreground hover:text-primary',
+                  'rounded-md px-4 py-3 text-base font-medium text-foreground hover:text-primary',
                   pathname.startsWith(item.link) && 'bg-accent text-primary'
                 )}
               >
@@ -101,7 +116,7 @@ function DesktopNav({ items }: { items: NavigationBar['items'] }) {
               <Link href={item.link} legacyBehavior passHref>
                 <NavigationMenuLink
                   className={cn(
-                    'rounded-md px-3 py-2 text-sm font-medium text-foreground hover:text-primary',
+                    'rounded-md px-4 py-3 text-base font-medium text-foreground hover:text-primary',
                     pathname === item.link && 'bg-accent text-primary'
                   )}
                 >

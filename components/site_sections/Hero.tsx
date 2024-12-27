@@ -63,8 +63,8 @@ const HeroSection = () => {
   return (
     <section className="relative flex min-h-screen items-center justify-center overflow-hidden py-20">
       <div
-        className="absolute inset-0 z-0 bg-cover bg-center"
-        style={{ backgroundImage: `url(${heroSectionData.backgroundMedia})` }}
+        className="absolute inset-0 z-0 bg-gradient-to-br from-purple-900/50 via-purple-800/30 to-background"
+        aria-hidden="true"
       />
       <div className={`absolute inset-0 z-10 ${heroSectionData.gradientOverlay}`} />
 
@@ -102,26 +102,33 @@ const HeroSection = () => {
               transition={{ duration: 0.5, delay: 0.6 + index * 0.1, ease: 'easeOut' }}
             >
               <div
-                className="flex cursor-pointer flex-col items-center rounded-lg bg-white/10 p-6 text-center backdrop-blur-sm transition-all hover:bg-white/20"
+                className="group flex h-[200px] w-full cursor-pointer flex-col items-center rounded-lg bg-white/10 p-6 text-center backdrop-blur-sm transition-all hover:bg-white/20"
                 onClick={() => toggleExpand(index)}
               >
-                <highlight.icon className={`mb-4 h-12 w-12 ${highlight.color}`} />
+                <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-white/5">
+                  <highlight.icon className={`h-8 w-8 ${highlight.color}`} />
+                </div>
                 <span className="text-xl font-semibold">{highlight.text}</span>
                 <motion.div
                   animate={{ rotate: expandedIndex === index ? 180 : 0 }}
                   transition={{ duration: 0.3 }}
+                  className="mt-auto"
                 >
-                  <ChevronRight className="mt-2 h-6 w-6" />
+                  <ChevronRight className="h-6 w-6" />
                 </motion.div>
               </div>
               <AnimatePresence>
                 {expandedIndex === index && (
                   <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.3 }}
-                    className="mt-4 w-full rounded-lg bg-white/5 p-4 text-center backdrop-blur-sm"
+                    initial={{ opacity: 0, height: 0, y: -20 }}
+                    animate={{ opacity: 1, height: 'auto', y: 0 }}
+                    exit={{ opacity: 0, height: 0, y: -20 }}
+                    transition={{
+                      duration: 0.3,
+                      height: { duration: 0.4 },
+                      opacity: { duration: 0.25 }
+                    }}
+                    className="mt-4 w-full overflow-hidden rounded-lg bg-white/5 p-4 text-center backdrop-blur-sm"
                   >
                     {highlight.description}
                   </motion.div>
