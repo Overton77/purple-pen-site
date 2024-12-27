@@ -1,0 +1,191 @@
+model ProjectOwner {
+  id                   Int       @id @default(autoincrement())
+  hashedPassword       String
+  username             String    @unique
+  email                String    @unique
+  firstName            String
+  lastName             String
+  currentWebsite       String?
+  additionalInformation String?
+  phoneNumber          String? 
+  formResponseId       Int       @unique 
+  formResponse         OnBoardingFormResponse? 
+  businessInformation  BusinessInformation[]
+  clientPackage        ClientPackage?
+  currentProject       CurrentProject?
+}
+
+enum ProjectStates { 
+  READY 
+  IN_PROGRESS 
+  COMPLETED 
+}
+
+model CurrentProject { 
+  id              Int      @id @default(autoincrement())   
+  name            String 
+  webOwnerId      Int      @unique 
+  webOwner        ProjectOwner @relation(fields: [webOwnerId], references: [id]) 
+  projectState    ProjectStates  
+  businessName    String 
+}
+
+model BusinessInformation {
+  id                               Int       @id @default(autoincrement())
+  businessName                     String 
+  businessDescription              String 
+  city                             String?
+  state                            String?
+  zip                              String?
+  country                          String?
+  currentWebsite                   String?
+  currentHostingPlatform           String?
+  currentDomainNameServicePlatform String?
+  twitterLink                      String?
+  fbLink                           String?
+  instagramLink                    String?
+  webOwnerId                       Int
+  webOwner                         ProjectOwner  @relation(fields: [webOwnerId], references: [id])
+}
+
+model ClientPackage {
+  id                  Int       @id @default(autoincrement())
+  webOwnerId          Int       @unique
+  webOwner            ProjectOwner  @relation(fields: [webOwnerId], references: [id])
+  custom              Boolean   @default(false) // True for custom, false for prebuilt
+  customPackageId     Int?      @unique
+  prebuiltOneServicePackageId   Int?      @unique 
+  prebuiltCombinationServicePackageId Int? @unique 
+  customPackage       CustomClientPackage? @relation(fields: [customPackageId], references: [id])
+  prebuiltOneServicePackage PreBuiltOneServicePackage? @relation(fields: [prebuiltOneServicePackageId], references: [id])
+  prebuiltCombinationPackage PreBuiltCombinationPackage? @relation(fields: [prebuiltCombinationServicePackageId], references: [id])
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+}
+
+model CustomClientPackage {
+  id                  Int       @id @default(autoincrement())
+  customFeatures      String?   // Comma-separated string of custom features
+  prebuiltOneServicePackageId   Int?      @unique
+  prebuiltCombinationPackageId  Int?      @unique
+  prebuiltOneServicePackage PreBuiltOneServicePackage? @relation(fields: [prebuiltOneServicePackageId], references: [id])
+  prebuiltCombinationPackage PreBuiltCombinationPackage? @relation(fields: [prebuiltCombinationPackageId], references: [id])
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  clientPackage       ClientPackage?  
+  
+  
+}
+
+model PreBuiltOneServicePackage {
+  id               Int       @id @default(autoincrement())
+  serviceType      ServiceType
+  serviceTierId    Int
+  serviceTier      OneServiceTier @relation(fields: [serviceTierId], references: [id])
+  baseFeatures     String?   
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @default(now())
+  clientPackage    ClientPackage?
+  customPackage    CustomClientPackage?
+}
+
+model PreBuiltCombinationPackage {
+  id               Int       @id @default(autoincrement())
+  name             String    
+  combinationServiceTierId Int
+  serviceTier     CombinationServiceTier @relation(fields: [combinationServiceTierId], references: [id])
+  baseFeatures     String?   
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @default(now())
+  clientPackage    ClientPackage?
+  customPackage    CustomClientPackage?
+}
+
+enum ServiceType {
+  DIGITAL_MARKETING
+  STORE
+  AI_AGENT
+}
+
+model Service {
+  id            Int       @id @default(autoincrement())
+  name          String
+  serviceType   ServiceType
+  negotiatedPrice Float?
+  description   String?
+  oneServiceTierId Int? @unique 
+  oneServiceTier OneServiceTier? @relation(fields: [oneServiceTierId], references: [id])
+  combinationServiceTiers CombinationServiceTier[] // Many-to-many relation
+}
+
+model OneServiceTier {
+  id            Int       @id @default(autoincrement())
+  level         String    
+  description   String?
+  basePrice     Float  
+  packages      PreBuiltOneServicePackage[]  // Changed this
+  service       Service?  
+  features      Feature[]
+}
+
+model CombinationServiceTier { 
+  id            Int       @id @default(autoincrement())
+  level         String    
+  description   String?
+  basePrice     Float 
+  packages      PreBuiltCombinationPackage[] // Changed this
+  services      Service[]
+  features      Feature[]
+}
+
+model Feature {
+  id            Int       @id @default(autoincrement())
+  name          String
+  description   String?
+  oneServiceTierId Int? 
+  oneServiceTier   OneServiceTier? @relation(fields: [oneServiceTierId], references: [id])  
+  combinationServiceTierId Int? 
+  combinationServiceTier CombinationServiceTier? @relation(fields: [combinationServiceTierId], references: [id])
+  milestones    Milestone[]
+} 
+
+enum MilestoneStatus { 
+  NOT_STARTED  
+  IN_PROGRESS 
+  COMPLETED 
+}
+
+model Milestone {
+  id              Int       @id @default(autoincrement())
+  featureId       Int?
+  feature         Feature?   @relation(fields: [featureId], references: [id])
+  name            String
+  description     String?
+  status          MilestoneStatus @default(NOT_STARTED)
+  startDate       DateTime?
+  projectedEndDate DateTime?
+}
+
+model OnBoardingFormResponse {
+  id                  Int       @id @default(autoincrement())
+  webOwnerId          Int       @unique
+  webOwner            ProjectOwner  @relation(fields: [webOwnerId], references: [id])
+
+  documentUrl         String?   // Link to a document or graphical design
+  otherSiteUrl        String?   // Example site they like
+  typography          String?   // Comma-separated typography preferences
+  colorPalette        String?   // Comma-separated color palette preferences
+  domainName          String?   // Desired domain name
+  currentDigitalPlatform String?  // Current digital marketing engine in use
+
+  needDigitalMarketing Boolean? // Whether digital marketing is required
+  needSEO             Boolean?  // Whether SEO is required
+  needContent         Boolean?  // Whether content creation is required
+  needAds             Boolean?  // Whether ads management is required
+  needAnalytics       Boolean?  // Whether analytics setup is required
+  foreseeAIUseCase    Boolean?  // Whether an AI agent/chatbot is foreseen
+
+  packagePreference   String    // "Prebuilt", "Custom", or "PrebuiltWithCustomFeatures"
+  prebuiltPackageId   Int?      @unique
+  customPackageId     Int?      @unique 
+}

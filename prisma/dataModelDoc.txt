@@ -1,0 +1,116 @@
+repo name: https://github.com/vercel/commerce
+
+Classes and Their Rules
+1. CombinationFeature
+
+    Purpose: Represents a feature within a CombinationServiceTier.
+    Attributes:
+        name: Name of the feature.
+        description: Auto-generated description based on tierName.
+        milestones: A list of milestones associated with the feature.
+    Rules:
+        The tierName is used to determine which tier the feature belongs to.
+        The milestones are dynamically fetched from combinationTierFeatureMilestoneMap based on the tier and feature name.
+        Ensure milestones are consolidated for all services within the tier.
+
+2. CombinationServiceTier
+
+    Purpose: Represents a service tier (e.g., Essential, Growth, Enterprise) that encompasses multiple services.
+    Attributes:
+        name: The name of the tier (e.g., Essential).
+        features: A list of CombinationFeature objects representing all features within the tier.
+    Rules:
+        Features are initialized dynamically using the combinationTierFeatureMilestoneMap.
+        Consolidate features across all services in the tier.
+        Remove duplicates using a Set to ensure unique features.
+
+3. CombinationService
+
+    Purpose: Represents a service package for a specific tier.
+    Attributes:
+        name: Name of the combination service (e.g., Combination Service).
+        tier: A CombinationServiceTier object corresponding to the specified tier.
+    Rules:
+        getMilestones method consolidates all milestones across the features in the tier.
+        Ensure milestones are unique by de-duplicating them with a Set.
+
+4. Feature
+
+    Purpose: Represents an individual feature within a OneServiceTier.
+    Attributes:
+        tierName: The name of the tier (e.g., Basic, Standard, Advanced).
+        name: Name of the feature.
+        description: Describes the feature.
+        milestones: Milestones fetched dynamically from featureToMilestoneMap.
+    Rules:
+        Fetch milestones dynamically based on tierName and feature name.
+        Maintain separation of OneServiceTier and CombinationServiceTier.
+
+5. OneServiceTier
+
+    Purpose: Represents a tier for a single service (e.g., Store, Digital Marketing, AI Agent).
+    Attributes:
+        name: Name of the tier (e.g., Basic).
+        features: A list of Feature objects representing the tier’s features.
+    Rules:
+        Each tier has its own set of features specific to the service.
+        Features are initialized using featureToMilestoneMap.
+
+Prisma Schema Rules
+1. General Rules
+
+    Enum Usage:
+        ServiceType and MilestoneStatus enums provide consistent categorization.
+    Relations:
+        Ensure foreign key relations are accurately defined between models (e.g., CombinationServiceTier and PreBuiltCombinationPackage).
+
+2. CombinationServiceTier
+
+    Represents a tier in the CombinationService.
+    Attributes:
+        level: The name of the tier (e.g., Essential, Growth, Enterprise).
+        services: Many-to-many relation with Service.
+        features: List of associated features.
+
+3. OneServiceTier
+
+    Represents a tier in individual services (e.g., Store, Digital Marketing).
+    Attributes:
+        level: The tier level (e.g., Basic, Standard, Advanced).
+        service: One-to-one relation with Service.
+        features: List of associated features.
+
+4. Feature
+
+    Represents a feature tied to either OneServiceTier or CombinationServiceTier.
+    Attributes:
+        name: Name of the feature.
+        description: Description of the feature.
+        milestones: Relation with Milestone.
+
+5. ClientPackage
+
+    Purpose: Tracks which package the client selects.
+    Attributes:
+        prebuiltOneServicePackageId: References a PreBuiltOneServicePackage.
+        prebuiltCombinationPackageId: References a PreBuiltCombinationPackage.
+
+Best Practices
+
+    Dynamic Data:
+        Use dynamic maps (featureToMilestoneMap, combinationTierFeatureMilestoneMap) to initialize features and milestones.
+        This ensures flexibility and consistency.
+
+    Unique Entries:
+        Deduplicate milestones and features using Set when consolidating them.
+
+    Separation of Concerns:
+        Keep OneServiceTier and CombinationServiceTier independent for better scalability.
+
+    Prisma Schema Validation:
+        Use enums and relations for strong typing and to prevent invalid entries.
+        Ensure database constraints match class definitions.
+
+    Documentation:
+        Maintain clear descriptions for all attributes and relations in both classes and the Prisma schema.
+
